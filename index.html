@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Field Researcher's Dilemma — Electoral Violence Seminar</title>
+<style>
+/* ============================================================
+   ROOT & VARIABLES
+   ============================================================ */
+:root {
+  --card: #ffffff;
+  --primary: #1c1c1c;
+  --primary-light: #333333;
+  --accent: #c08030;
+  --accent-light: #d4933a;
+  --success: #2d6e4e;
+  --success-bg: #e8f4ed;
+  --error: #8b2c2c;
+  --error-bg: #fbeaea;
+  --warning-bg: #fdf8f0;
+  --text: #111111;
+  --text-muted: #68645e;
+  --border: #e4e0d8;
+  --border-light: #eeebe4;
+  --shadow: 0 2px 8px rgba(20,20,20,0.07);
+  --shadow-md: 0 4px 20px rgba(20,20,20,0.11);
+  --radius: 8px;
+  --trans: 0.22s ease;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* Subtle warm-grey background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+    #f4f2ef 0%,
+    #f2f0ec 60%,
+    #eeecea 100%
+  );
+}
+body {
+  font-family: Georgia, 'Times New Roman', serif;
+  background: transparent;
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.75;
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+#progress-container {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 6px rgba(44,40,32,0.07);
+  padding: 10px 24px 8px;
+}
+#progress-label {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+#progress-track {
+  display: flex;
+  gap: 3px;
+}
+.ps {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.ps-bar {
+  height: 4px;
+  width: 100%;
+  background: var(--border);
+  border-radius: 2px;
+  transition: background var(--trans);
+}
+.ps.active .ps-bar { background: var(--primary); }
+.ps.done .ps-bar { background: var(--success); }
+.ps-label {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
+}
+.ps.active .ps-label { color: var(--primary); font-weight: 700; }
+.ps.done .ps-label { color: var(--success); }
+
+/* ============================================================
+   MAIN LAYOUT
+   ============================================================ */
+#main-content {
+  max-width: 990px;
+  margin: 0 auto;
+  padding: 88px 24px 88px;
+}
+#page-footer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  text-align: center;
+  padding: 6px 24px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  background: var(--card);
+  border-top: 1px solid var(--border-light);
+}
+
+/* ============================================================
+   SCREENS
+   ============================================================ */
+.screen { display: none; }
+.screen.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+h1 { font-size: 2rem; color: var(--text); line-height: 1.2; margin-bottom: 0.5rem; }
+h2 { font-size: 1.45rem; color: var(--text); line-height: 1.3; margin-bottom: 0.75rem; }
+h3 { font-size: 1.1rem; color: var(--text); margin-bottom: 0.5rem; }
+p { margin-bottom: 1rem; }
+p:last-child { margin-bottom: 0; }
+.lead { font-size: 1.08rem; line-height: 1.85; }
+.eyebrow {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 0.45rem;
+}
+.muted {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+.card-accent { border-left: 4px solid var(--accent); }
+.card-primary { border-left: 4px solid var(--primary); }
+.card-success { border-left: 4px solid var(--success); background: var(--success-bg); }
+.card-note {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  font-size: 0.97rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 600;
+  transition: all var(--trans);
+  letter-spacing: 0.01em;
+}
+.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+.btn-primary:hover:not(:disabled) { background: var(--primary-light); border-color: var(--primary-light); }
+.btn-primary:disabled {
+  background: var(--border);
+  border-color: var(--border);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+.btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-accent:hover { background: var(--accent-light); border-color: var(--accent-light); }
+.btn-outline { background: transparent; color: var(--primary); border-color: var(--primary); }
+.btn-outline:hover { background: var(--primary); color: #fff; }
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+
+/* MCQ choice buttons */
+.mcq-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 14px 18px;
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.94rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--text);
+  transition: all var(--trans);
+  margin-bottom: 10px;
+  line-height: 1.55;
+}
+.mcq-option:hover { border-color: var(--primary); background: #f4f2ef; }
+.mcq-option.selected { border-color: var(--primary); background: #edeae4; }
+.mcq-option.correct { border-color: var(--success); background: var(--success-bg); color: #1a5035; }
+.mcq-option.incorrect { border-color: var(--error); background: var(--error-bg); color: var(--error); }
+.mcq-option:disabled { cursor: default; }
+.opt-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.78rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: all var(--trans);
+}
+.mcq-option.selected .opt-label { background: var(--primary); color: #fff; }
+.mcq-option.correct .opt-label { background: var(--success); color: #fff; }
+.mcq-option.incorrect .opt-label { background: var(--error); color: #fff; }
+
+/* Fieldwork choice buttons */
+.fw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+.fw-btn {
+  padding: 24px 18px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--trans);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+.fw-btn:hover { border-color: var(--primary); box-shadow: var(--shadow-md); }
+.fw-btn.chosen { border-color: var(--accent); background: var(--warning-bg); }
+.fw-icon { font-size: 2.2rem; margin-bottom: 8px; }
+.fw-title { font-weight: 700; color: var(--primary); font-size: 1rem; }
+.fw-sub { font-size: 0.83rem; color: var(--text-muted); margin-top: 4px; }
+
+/* ============================================================
+   CASE TABLE
+   ============================================================ */
+.table-wrap {
+  margin: 16px 0 8px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+table.ct {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.76rem;
+  background: var(--card);
+}
+table.ct thead th {
+  background: #1c1c1c;
+  color: #fff;
+  padding: 7px 9px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+table.ct tbody tr {
+  border-bottom: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: background var(--trans);
+}
+table.ct tbody tr:hover { background: #f7f4ef; }
+table.ct tbody tr.row-selected { background: #fef3e0; }
+table.ct tbody tr.row-single { background: #dff0e8; }
+table.ct td { padding: 7px 9px; vertical-align: middle; }
+table.ct td.dn { font-weight: 700; color: var(--primary); }
+table.ct td.dn .sel-mark { display: none; color: var(--primary); margin-right: 4px; }
+table.ct tbody tr.row-selected td.dn .sel-mark { display: inline; }
+table.ct tbody tr.row-single td.dn .sel-mark { display: inline; color: var(--success); }
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 12px;
+  font-size: 0.77rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge-viol { white-space: normal; max-width: 160px; text-align: left; line-height: 1.4; }
+.bvh { background: #f0d0d0; color: #6a1515; }
+.bh  { background: #fbe8e8; color: #8b2c2c; }
+.bm  { background: #fdf5e6; color: #7a5a14; }
+.bl  { background: var(--success-bg); color: #1e5238; }
+.bn  { background: var(--border-light); color: var(--text-muted); }
+.district-note { font-size: 0.78rem; color: var(--text-muted); font-style: italic; }
+
+/* Selection counter */
+.sel-counter {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.sel-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+/* ============================================================
+   FEEDBACK & REVEAL PANELS
+   ============================================================ */
+.feedback {
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-top: 16px;
+  display: none;
+  animation: fadeIn 0.25s ease;
+}
+.feedback.vis { display: block; }
+.fb-success { background: var(--success-bg); border: 1px solid #a8d4bc; border-left: 4px solid var(--success); }
+.fb-error   { background: var(--error-bg);   border: 1px solid #e0b0b0; border-left: 4px solid var(--error); }
+.fb-info    { background: var(--warning-bg); border: 1px solid #e0d0a0; border-left: 4px solid var(--accent); }
+.fb-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.9rem;
+}
+.fb-success .fb-title { color: var(--success); }
+.fb-error   .fb-title { color: var(--error); }
+.fb-info    .fb-title { color: var(--accent); }
+
+.reveal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-top: 16px;
+  display: none;
+}
+.reveal.vis { display: block; animation: fadeIn 0.3s ease; }
+.reveal-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+/* ============================================================
+   FREE TEXT
+   ============================================================ */
+.ft-wrap { margin-top: 18px; }
+.ft-label {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 7px;
+}
+textarea {
+  width: 100%;
+  min-height: 130px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-family: Georgia, serif;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--card);
+  resize: vertical;
+  line-height: 1.65;
+  transition: border-color var(--trans);
+}
+textarea:focus { outline: none; border-color: var(--primary); }
+textarea::placeholder { color: var(--text-muted); font-style: italic; }
+
+/* ============================================================
+   SCREEN BANNERS
+   ============================================================ */
+.screen-banner {
+  position: relative;
+  border-radius: var(--radius);
+  padding: 44px 44px 36px;
+  margin-bottom: 24px;
+  overflow: hidden;
+  color: #fff;
+  animation: fadeIn 0.4s ease;
+}
+.screen-banner .bn-deco { display: none; }
+.screen-banner .bn-kicker {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 10px;
+}
+.screen-banner h1, .screen-banner h2 {
+  color: #fff;
+  margin-bottom: 8px;
+}
+.screen-banner .bn-sub {
+  color: rgba(255,255,255,0.72);
+  font-size: 0.97rem;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-style: italic;
+}
+/* Charcoal banners — uniform base with a barely-visible warm tint per stage */
+.bn-intro { background: url('banner-intro.png') center / cover no-repeat; }
+.bn-s1    { background: url('banner-s1.png') center / cover no-repeat; }
+.bn-s2    { background: url('banner-s2.png') center / cover no-repeat; }
+.bn-s3    { background: url('banner-s3.png') center / cover no-repeat; }
+.bn-s4    { background: url('banner-s4.png') center / cover no-repeat; }
+.bn-s5    { background: url('banner-s5.png') center / cover no-repeat; }
+.bn-s6    { background: url('banner-s6.png') center / cover no-repeat; }
+.bn-s7    { background: url('banner-s7.png') center / cover no-repeat; }
+
+/* ============================================================
+   PAIR CONFIRMATION BANNER
+   ============================================================ */
+.pair-banner {
+  background: #fef9ee;
+  border: 1px solid #e8d8b4;
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.9rem;
+  color: #7a4e10;
+}
+.pair-banner strong { font-weight: 700; }
+
+/* ============================================================
+   DIVIDER
+   ============================================================ */
+hr.divider { border: none; border-top: 1px solid var(--border-light); margin: 24px 0; }
+
+/* ============================================================
+   DOWNLOAD SECTION
+   ============================================================ */
+.dl-section {
+  background: #1c1c1c;
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  text-align: center;
+  margin-top: 28px;
+}
+.dl-section h3 { color: #fff; margin-bottom: 8px; }
+.dl-section p { color: rgba(255,255,255,0.78); margin-bottom: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 0.92rem; }
+.btn-dl {
+  background: var(--accent);
+  color: #fff;
+  border: 2px solid var(--accent);
+  padding: 13px 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.97rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 700;
+  transition: all var(--trans);
+}
+.btn-dl:hover { background: var(--accent-light); border-color: var(--accent-light); }
+
+/* Unknown covariate cells */
+.badge-unknown {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 12px;
+  font-size: 0.77rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: #e4e0d8;
+  color: var(--text-muted);
+  font-style: normal;
+}
+td.cell-unknown { color: var(--text-muted); }
+
+/* Group member inputs */
+.gm-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.96rem;
+  color: var(--text);
+  transition: border-color var(--trans);
+}
+.gm-input:focus { outline: none; border-color: var(--primary); }
+
+/* Learning outcome list */
+.lo-list {
+  margin: 14px 0 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.lo-list li {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  line-height: 1.6;
+}
+.lo-num {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     PROGRESS BAR
+     ============================================================ -->
+<div id="progress-container">
+  <div id="progress-label">Research progress</div>
+  <div id="progress-track">
+    <div class="ps" id="ps1"><div class="ps-bar"></div><div class="ps-label">Case Selection</div></div>
+    <div class="ps" id="ps2"><div class="ps-bar"></div><div class="ps-label">Design Reflection</div></div>
+    <div class="ps" id="ps3"><div class="ps-bar"></div><div class="ps-label">Single Case</div></div>
+    <div class="ps" id="ps4"><div class="ps-bar"></div><div class="ps-label">Into the Field</div></div>
+    <div class="ps" id="ps5"><div class="ps-bar"></div><div class="ps-label">Uniqueness</div></div>
+    <div class="ps" id="ps6"><div class="ps-bar"></div><div class="ps-label">The Crisis</div></div>
+    <div class="ps" id="ps7"><div class="ps-bar"></div><div class="ps-label">Findings</div></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<div id="main-content">
+
+  <!-- ========================================================
+       SCREEN: LEARNING OUTCOMES
+       ======================================================== -->
+  <div id="screen-learning-outcomes" class="screen active">
+    <div class="screen-banner bn-intro">
+      <span class="bn-kicker">Advanced Qualitative Methods</span>
+      <h1>The Field Researcher's Dilemma</h1>
+      <p class="bn-sub">A simulation in qualitative case selection</p>
+      <div class="bn-deco">00</div>
+    </div>
+
+    <div class="card card-accent">
+      <h3>Learning Outcomes</h3>
+      <p>By the end of this seminar, you should be able to:</p>
+      <ul class="lo-list">
+        <li>
+          <span class="lo-num">1</span>
+          <span>Understand the logic and limitations of most-similar systems designs (MSSD) in qualitative comparative research, and apply these principles to a realistic case selection problem involving incomplete information and trade-offs.</span>
+        </li>
+        <li>
+          <span class="lo-num">2</span>
+          <span>Critically evaluate the trade-offs involved in selecting research cases — balancing design quality, ethical constraints, practical feasibility, and the challenge of reasoning under uncertainty about key covariates.</span>
+        </li>
+        <li>
+          <span class="lo-num">3</span>
+          <span>Work through a simulated research process from case selection to fieldwork crisis, building practical skills and conceptual vocabulary that directly prepare you for the final course assignment.</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card card-note">
+      <strong>How this seminar works:</strong> You will work through a series of research decisions in sequence, each building on the last. Some stages have clear right and wrong answers — you will need to find them before moving on. Others are open-ended group discussions with no single correct response. A progress bar at the top tracks where you are. At the end, save a PDF summary of your group's answers and send them to Sebastian via email.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goTo('screen-group')">Start &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       SCREEN: GROUP MEMBERS
+       ======================================================== -->
+  <div id="screen-group" class="screen">
+    <div class="screen-banner bn-intro">
+      <span class="bn-kicker">Before You Begin</span>
+      <h2>Register Your Group</h2>
+      <p class="bn-sub">Your names will appear in the downloadable summary.</p>
+      <div class="bn-deco">00</div>
+    </div>
+
+    <div class="card card-primary">
+      <p>Enter the names of everyone in your group. These will be included at the top of the PDF summary you can download at the end of the seminar.</p>
+    </div>
+
+    <div class="card">
+      <div style="display:grid; gap:14px;">
+        <div>
+          <label style="display:block; font-weight:600; margin-bottom:5px;">Member 1</label>
+          <input type="text" id="gm1" class="gm-input" placeholder="Full name">
+        </div>
+        <div>
+          <label style="display:block; font-weight:600; margin-bottom:5px;">Member 2</label>
+          <input type="text" id="gm2" class="gm-input" placeholder="Full name">
+        </div>
+        <div>
+          <label style="display:block; font-weight:600; margin-bottom:5px;">Member 3 <span style="font-weight:400; color:var(--text-muted)">(optional)</span></label>
+          <input type="text" id="gm3" class="gm-input" placeholder="Full name">
+        </div>
+        <div>
+          <label style="display:block; font-weight:600; margin-bottom:5px;">Member 4 <span style="font-weight:400; color:var(--text-muted)">(optional)</span></label>
+          <input type="text" id="gm4" class="gm-input" placeholder="Full name">
+        </div>
+        <div>
+          <label style="display:block; font-weight:600; margin-bottom:5px;">Member 5 <span style="font-weight:400; color:var(--text-muted)">(optional)</span></label>
+          <input type="text" id="gm5" class="gm-input" placeholder="Full name">
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="submitGroup()">Begin seminar &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       SCREEN: INTRO
+       ======================================================== -->
+  <div id="screen-intro" class="screen">
+    <div class="screen-banner bn-intro">
+      <span class="bn-kicker">Advanced Qualitative Methods</span>
+      <h1>The Field Researcher's Dilemma</h1>
+      <p class="bn-sub">Eight districts. One theory. Your judgment.</p>
+      <div class="bn-deco">01</div>
+    </div>
+
+    <div class="card card-accent">
+      <p class="lead">You are, for now, a figment of your own ambitions. A PhD candidate, notebook in hand, inspired by one paper above all others — Hanne Fjelde's landmark study of political party strength and electoral violence, published in the <em>Journal of Peace Research</em>. Fjelde showed, across all national elections from 1946 to 2010, that strong party organizations reduce the risk of electoral violence. The statistics are compelling. But statistics, you keep thinking, cannot tell you <em>why</em>.</p>
+      <p>You want to go deeper. You want to design a qualitative study that tests and refines Fjelde's argument from the ground up — district by district, interview by interview. And to do that, you first need to make the most consequential decision in any qualitative researcher's career: <strong>which cases do you study?</strong></p>
+    </div>
+
+    <div class="card">
+      <h3>Fjelde's Argument, in Brief</h3>
+      <p>Fjelde argues that <strong>strong political party organizations</strong> reduce electoral violence through two mechanisms:</p>
+      <p><strong>1. They reduce the incentive to use violence.</strong> Strong parties can mobilize voters through organizational outreach — local branches, programmatic appeals, stable networks. Violence is costly and risky; parties with better tools don't need it.</p>
+      <p><strong>2. They constrain individual actors from deploying violence.</strong> Institutionalized parties impose formal and informal rules on their members. Leaders and grassroots actors are less free to act unilaterally — the organization itself acts as a brake on violence.</p>
+      <p class="muted">Your task is to design a qualitative study that can test and refine this argument at the voting district level, where politics plays out in streets, polling stations, and party offices.</p>
+    </div>
+
+    <div class="card card-note">
+      <strong>How this seminar works:</strong> You will work through a series of research decisions, each building on the last. Some questions have clear right and wrong answers — you'll need to find them before moving on. Others are open-ended discussion prompts where there is no single correct response. A progress bar at the top tracks where you are. At the end, you can download a summary of your group's answers.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goTo('screen-s1')">Begin your research journey &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       SCREEN S1: CASE SELECTION
+       ======================================================== -->
+  <div id="screen-s1" class="screen">
+    <div class="screen-banner bn-s1">
+      <span class="bn-kicker">Stage 1 — Case Selection</span>
+      <h2>Select Your Cases</h2>
+      <p class="bn-sub">Eight districts. Which two give you the cleanest comparison?</p>
+      <div class="bn-deco">02</div>
+    </div>
+
+    <div class="card card-primary">
+      <p>Below are eight voting districts from a country where electoral violence has been a recurring problem. For most districts, you have information on levels of violence, ethnic polarization, electoral competitiveness, and electoral fraud. For some districts, certain covariates could not be established from available sources and are marked as unknown. Party strength — your independent variable — remains unknown for all districts and will only be revealed once you have completed your fieldwork.</p>
+      <p>Your task is to select <strong>two districts</strong> for an in-depth comparative study. There is no perfect design, so you need to identify the <strong>best-available</strong> design(s).</p>
+    </div>
+
+    <div class="card-note muted">Click on two rows to select them. Click again to deselect.</div>
+
+    <div class="sel-counter">
+      <div class="sel-count-badge" id="s1-count">0</div>
+      <span id="s1-count-label">districts selected (select exactly 2)</span>
+    </div>
+
+    <div class="table-wrap" id="s1-table-wrap">
+      <!-- Built by JS -->
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="s1-analyze-btn" disabled onclick="analyzeS1Pair()">Analyze selected pair &rarr;</button>
+    </div>
+
+    <div class="feedback fb-success" id="s1-fb-success">
+      <div class="fb-title" id="s1-fb-success-title">✓ Valid comparison</div>
+      <div id="s1-fb-success-body"></div>
+      <div class="btn-row" style="margin-top:16px;">
+        <button class="btn btn-primary" onclick="goTo('screen-s2a')">Continue to design reflection &rarr;</button>
+      </div>
+    </div>
+
+    <div class="feedback fb-error" id="s1-fb-error">
+      <div class="fb-title">✗ This pair won't work</div>
+      <div id="s1-fb-error-body"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       SCREEN S2A: MCQ — STRENGTHS
+       ======================================================== -->
+  <div id="screen-s2a" class="screen">
+    <div class="screen-banner bn-s2">
+      <span class="bn-kicker">Stage 2 — Design Reflection · Question 1 of 3</span>
+      <h2>What Are the Key Strengths of Your Design?</h2>
+      <p class="bn-sub">Every design has advantages. What are yours?</p>
+      <div class="bn-deco">03</div>
+    </div>
+
+    <div id="s2a-pair-banner" class="pair-banner"></div>
+
+    <div class="card card-primary">
+      <p>You've made your case selection. Before you pack your bags, take a moment to think clearly about what your research design can and cannot do. A good researcher knows the strengths and limitations of their approach before they enter the field — not after.</p>
+      <p>Select the answer that best captures the core strength of a most-similar systems comparative design.</p>
+    </div>
+
+    <div id="s2a-options"><!-- Built by JS --></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="s2a-check-btn" onclick="checkS2A()">Check answer</button>
+    </div>
+
+    <div class="feedback" id="s2a-feedback"></div>
+
+    <div class="btn-row" id="s2a-next-row" style="display:none;">
+      <button class="btn btn-primary" onclick="goTo('screen-s2b')">Next question &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       SCREEN S2B: MCQ — LIMITATIONS
+       ======================================================== -->
+  <div id="screen-s2b" class="screen">
+    <div class="screen-banner bn-s2">
+      <span class="bn-kicker">Stage 2 — Design Reflection · Question 2 of 3</span>
+      <h2>What Are the Key Limitations of Your Design?</h2>
+      <p class="bn-sub">Knowing your blind spots is half the battle.</p>
+      <div class="bn-deco">03</div>
+    </div>
+
+    <div id="s2b-pair-banner" class="pair-banner"></div>
+
+    <div class="card card-primary">
+      <p>Every research design involves trade-offs. The limitation you identify here should reflect the specific methodological challenge you accepted when you chose your pair. Select the answer that best captures the core limitation of your particular comparison.</p>
+    </div>
+
+    <div id="s2b-options"><!-- Built by JS --></div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="s2b-check-btn" onclick="checkS2B()">Check answer</button>
+    </div>
+
+    <div class="feedback" id="s2b-feedback"></div>
+
+    <div class="btn-row" id="s2b-next-row" style="display:none;">
+      <button class="btn btn-primary" onclick="goTo('screen-s2c')">Next question &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       SCREEN S2C: MCQ — DESIGN TYPE
+       ======================================================== -->
+  <div id="screen-s2c" class="screen">
+    <div class="screen-banner bn-s2">
+      <span class="bn-kicker">Stage 2 — Design Reflection · Question 3 of 3</span>
+      <h2>Which Type of Comparative Design Are You Using?</h2>
+      <p class="bn-sub">Name it before you claim it.</p>
+      <div class="bn-deco">03</div>
+    </div>
+
+    <div class="card card-primary">
+      <p>You've selected two districts that are similar on most background conditions but differ on your key independent variable (party strength) and your outcome (electoral violence). There's a name for this kind of design. Which one is it?</p>
+    </div>
+
+    <button class="mcq-option" id="s2c-a" onclick="selectMCQ('s2c','a')">
+      <span class="opt-label">A</span>
+      <span>Most-Different Systems Design (MDSD) — compare cases that differ on almost everything, but share the same outcome, in order to identify the common causal factor.</span>
+    </button>
+    <button class="mcq-option" id="s2c-b" onclick="selectMCQ('s2c','b')">
+      <span class="opt-label">B</span>
+      <span>Structured Focused Comparison — use a standardized set of questions to compare cases with no prior expectation of similarity or difference between them.</span>
+    </button>
+    <button class="mcq-option" id="s2c-c" onclick="selectMCQ('s2c','c')">
+      <span class="opt-label">C</span>
+      <span>Most-Similar Systems Design (MSSD) — compare cases that are alike on everything except the independent variable and the outcome, in order to isolate the effect of the IV.</span>
+    </button>
+    <button class="mcq-option" id="s2c-d" onclick="selectMCQ('s2c','d')">
+      <span class="opt-label">D</span>
+      <span>Single-case process tracing — reconstruct the causal chain within a single case in order to test a specific theoretical mechanism.</span>
+    </button>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" id="s2c-check-btn" onclick="checkS2C()">Check answer</button>
+    </div>
+
+    <div class="feedback" id="s2c-feedback"></div>
+
+    <div class="btn-row" id="s2c-next-row" style="display:none;">
+      <button class="btn btn-primary" onclick="goTo('screen-s3')">Move on to case types &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       SCREEN S3: SINGLE CASE STUDY
+       ======================================================== -->
+  <div id="screen-s3" class="screen">
+    <div class="screen-banner bn-s3">
+      <span class="bn-kicker">Stage 3 — Single-Case Study</span>
+      <h2>Which District Would Make the Best Single Case?</h2>
+      <p class="bn-sub">Sometimes one case teaches more than two.</p>
+      <div class="bn-deco">04</div>
+    </div>
+
+    <div class="card card-accent">
+      <p>Not all research questions call for a comparison. Sometimes, a single well-chosen case can teach you more than two mediocre ones side by side. The art lies in knowing what kind of case you're dealing with — and what kind of analytical leverage it gives you.</p>
+      <p>Step back from your comparative pair. Look across all eight districts. <strong>Which one would you select for an in-depth single-case study — and why?</strong> Consider what type of case it represents and what you could learn from it that a comparative design could not easily give you.</p>
+    </div>
+
+    <div class="card-note muted">Click on one row to select your single case. Then explain your reasoning in the text box below.</div>
+
+    <div class="table-wrap" id="s3-table-wrap">
+      <!-- Built by JS -->
+    </div>
+
+    <div id="s3-ft-section" style="display:none;">
+      <div class="ft-wrap">
+        <label class="ft-label" for="s3-text">Your group's reasoning</label>
+        <textarea id="s3-text" placeholder="Discuss with your group: Why is this an interesting single case? What type of case is it (typical, deviant, extreme, crucial)? What analytical leverage does it offer that a comparative design would not?"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="submitS3()">Submit &rarr;</button>
+      </div>
+    </div>
+
+    <div class="feedback" id="s3-feedback"></div>
+
+    <div class="btn-row" id="s3-next-row" style="display:none;">
+      <button class="btn btn-primary" onclick="goTo('screen-s4')">Move to the field &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       SCREEN S4: INTO THE FIELD
+       ======================================================== -->
+  <div id="screen-s4" class="screen">
+    <div class="screen-banner bn-s4">
+      <span class="bn-kicker">Stage 4 — Into the Field</span>
+      <h2>Where Do You Land First?</h2>
+      <p class="bn-sub">The flights are booked. The notebooks are blank.</p>
+      <div class="bn-deco">05</div>
+    </div>
+
+    <div class="card card-accent">
+      <p>The grant has come through. Your ethics clearance is approved (for the pair you selected). The flights are booked, the notebooks are blank, and the clock is ticking. You have two districts to visit — and you need to decide where to start.</p>
+      <p>Seasoned fieldworkers disagree on this. Some swear by starting in the high-violence site — to get the most difficult, emotionally demanding work done while you're still fresh. Others argue for starting low — to build your interpretive baseline before encountering the full force of the phenomenon you're studying.</p>
+      <p><strong>Where do you begin?</strong></p>
+    </div>
+
+    <div class="fw-grid">
+      <button class="fw-btn" id="fw-high-btn" onclick="chooseFieldwork('high')">
+        <div class="fw-icon">🔥</div>
+        <div class="fw-title" id="fw-high-label">The high-violence district</div>
+        <div class="fw-sub" id="fw-high-sub">Start where the action is</div>
+      </button>
+      <button class="fw-btn" id="fw-low-btn" onclick="chooseFieldwork('low')">
+        <div class="fw-icon">🕊️</div>
+        <div class="fw-title" id="fw-low-label">The low-violence district</div>
+        <div class="fw-sub" id="fw-low-sub">Build your baseline first</div>
+      </button>
+    </div>
+
+    <div id="s4-ft-section" style="display:none;">
+      <div class="card card-note">
+        <strong>You've chosen to start in <span id="s4-chosen-label">—</span>.</strong> Before you board the plane, discuss the following with your group.
+      </div>
+      <div class="ft-wrap">
+        <label class="ft-label" for="s4-text">Anticipated benefits and challenges</label>
+        <textarea id="s4-text" placeholder="What do you expect to gain from starting here? What challenges might you face — in terms of access, emotional toll, analytical framing, or interview dynamics? How might starting here shape what you look for in the second district?"></textarea>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="submitS4()">Continue to interviews &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       SCREEN S5A: UNIQUENESS — PART A
+       ======================================================== -->
+  <div id="screen-s5a" class="screen">
+    <div class="screen-banner bn-s5">
+      <span class="bn-kicker">Stage 5 — The Uniqueness Problem · Part A</span>
+      <h2>Is This District Really Unique?</h2>
+      <p class="bn-sub">"You have to understand — this place is different from everywhere else."</p>
+      <div class="bn-deco">06</div>
+    </div>
+
+    <div class="card card-accent">
+      <p>You've been in the field for three weeks. The interviews are going well — perhaps too well. Again and again, your research participants offer a variation of the same observation: <em>"You have to understand, this district is different from everywhere else. What happens here can't be compared to other places. Our history, our community — it's unique."</em></p>
+      <p>It's a seductive claim. And it may not be entirely wrong. But before you accept it — before you let it reshape your design — you need to stop and ask a harder question.</p>
+    </div>
+
+    <div class="card card-primary">
+      <h3>Before you accept that this district is exceptional, investigate the claim.</h3>
+      <p>It is a well-documented feature of human psychology that people across the world believe their own communities are unlike any other. This is not evidence of structural uniqueness — it is a near-universal feature of local identity. The fact that your research participants <em>believe</em> their district is unique tells you something important about community identity. It does not, by itself, tell you whether the district actually deviates from broader patterns.</p>
+      <p><strong>Your task is to treat the uniqueness claim as something to be assessed carefully, not a finding to be accepted.</strong></p>
+    </div>
+
+    <div class="ft-wrap">
+      <label class="ft-label" for="s5a-text">Discuss with your group: How would you verify the claim?</label>
+      <textarea id="s5a-text" placeholder="How would you go about assessing whether this district is genuinely exceptional? What sources, comparisons, or data would you consult? What would it take to confirm — or disconfirm — the uniqueness claim? Be specific about your approach."></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="submitS5A()">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       SCREEN S5B: UNIQUENESS — PART B
+       ======================================================== -->
+  <div id="screen-s5b" class="screen">
+    <div class="screen-banner bn-s5">
+      <span class="bn-kicker">Stage 5 — The Uniqueness Problem · Part B</span>
+      <h2>What If the Uniqueness Claim Holds?</h2>
+      <p class="bn-sub">Your comparison just got complicated.</p>
+      <div class="bn-deco">06</div>
+    </div>
+
+    <div class="card card-accent">
+      <p>Suppose your investigation reveals that the uniqueness claim has merit. After checking the secondary literature, comparing structural indicators across districts, and triangulating your interviews, you are forced to conclude: this district does have a distinctive feature — one that is not shared by your comparison case, and that may independently explain the pattern of violence you observe.</p>
+      <p>This is a genuine problem for your comparative design. If the two cases differ on more than just party strength, then the difference in violence cannot be straightforwardly attributed to the IV.</p>
+    </div>
+
+    <div class="ft-wrap">
+      <label class="ft-label" for="s5b-text">Discuss with your group: What do you do?</label>
+      <textarea id="s5b-text" placeholder="What options do you have? How do you salvage the comparative design — or do you need to rethink it?"></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="submitS5B()">Continue fieldwork &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       SCREEN S6: MEASUREMENT CRISIS
+       ======================================================== -->
+  <div id="screen-s6" class="screen">
+    <div class="screen-banner bn-s6">
+      <span class="bn-kicker">Stage 6 — A Research Design Crisis</span>
+      <h2>The Ground Shifts Beneath Your Feet</h2>
+      <p class="bn-sub">The violence wasn't what you thought it was.</p>
+      <div class="bn-deco">07</div>
+    </div>
+
+    <div class="card" style="border-left: 4px solid var(--error); background: #fdf4f4;">
+      <p>Months into your fieldwork in <strong id="s6-district-name">[high-violence district]</strong>, you make a discovery that changes everything.</p>
+      <p>You've been meticulously documenting incidents of electoral violence — attacks on party offices, intimidation of voters, clashes between political supporters. The case looked exactly as advertised: high levels of violence during the electoral period, concentrated in the political spaces your theory predicts. But as your interviews deepen and your local contacts multiply, a different story begins to emerge.</p>
+      <p>A large share of the violence — more than you initially estimated, possibly a majority — was not perpetrated by political party supporters at all. It was carried out by criminal gangs who, for reasons of their own, adopted the visual and rhetorical trappings of political affiliation. They wore party colors. They used party slogans. But they were motivated by profit, not electoral outcomes. By your working definition of electoral violence, much of what you documented doesn't qualify.</p>
+      <p><strong>You have invested too much — in time, in relationships, in your PhD timeline — to change your case selection. What do you do?</strong></p>
+    </div>
+
+    <div class="ft-wrap">
+      <label class="ft-label" for="s6-text">Discuss with your group: How do you resolve this crisis?</label>
+      <textarea id="s6-text" placeholder="Is this a fatal flaw — or a finding? Can you reframe your research question? Should you revise your definition of electoral violence? Is there value in studying a case where criminal and political violence blurred together? What does this mean for your comparison with the low-violence district?"></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="submitS6()">See your findings &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       SCREEN S7: FINAL FINDINGS
+       ======================================================== -->
+  <div id="screen-s7" class="screen">
+    <div class="screen-banner bn-s7">
+      <span class="bn-kicker">Stage 7 — Findings</span>
+      <h2>Back from the Field</h2>
+      <p class="bn-sub">Months of fieldwork. Now: what does it all mean?</p>
+      <div class="bn-deco">08</div>
+    </div>
+
+    <div class="card card-accent">
+      <p>You've done it. After months of interviews, archival work, and more than a few sleepless nights, you're back at your desk with a stack of notebooks and a head full of contradictions. The fieldwork is finished. The data is in.</p>
+      <p>Below is the final picture of your two districts — now including the party strength data that was hidden from you at the start. Your task is to examine what you found and ask: what conclusions does your comparative design actually support?</p>
+    </div>
+
+    <div class="table-wrap" id="s7-table-wrap">
+      <!-- Built by JS -->
+    </div>
+
+    <hr class="divider">
+
+    <div class="card card-primary">
+      <h3>What do your findings support?</h3>
+      <p>Look carefully at the party strength values your districts received. Do they support Fjelde's argument — or complicate it? Does the pattern match what your theory predicted? If not, what might explain the divergence? And what type of conclusion can a two-case comparison legitimately support?</p>
+    </div>
+
+    <div class="ft-wrap">
+      <label class="ft-label" for="s7-text">Your group's conclusions</label>
+      <textarea id="s7-text" placeholder="What conclusions do your findings support? Are they consistent with Fjelde's theory? What alternative explanations might account for the pattern — or the lack of one? What are the limits of what a two-case comparative study can claim? What would you need to do next to build a stronger argument?"></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="submitS7()">Submit conclusions &rarr;</button>
+    </div>
+
+    <div class="dl-section" id="s7-dl-section" style="display:none;">
+      <h3>Your research journey is complete</h3>
+      <p>Download a summary of your group's answers across all seven stages. Use it to guide your plenary discussion.</p>
+      <button class="btn-dl" onclick="downloadAnswers()">&#8595; Save group notes as PDF</button>
+    </div>
+  </div>
+
+</div><!-- /main-content -->
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const DISTRICTS = {
+  varano:  { name:'Varano',  violence:'High',       violLevel:'high',      eth:'?',   ethTrue:'Low',    comp:'Low',  fraud:'Medium', note:'—',                                      special:null         },
+  soleva:  { name:'Soleva',  violence:'Low',        violLevel:'low',       eth:'Medium',              comp:'Low',  fraud:'Medium', note:'—',                                      special:null         },
+  mirhal:  { name:'Mirhal',  violence:'Very High',  violLevel:'very-high', eth:'High',               comp:'High', fraud:'High',   note:'Very high levels of state repression',   special:'safety'     },
+  brenta:  { name:'Brenta',  violence:'Low',        violLevel:'low',       eth:'High',                comp:'High', fraud:'High',   note:'—',                                      special:null         },
+  ostara:  { name:'Ostara',  violence:'High',       violLevel:'high',      eth:'?',   ethTrue:'Medium', comp:'High', fraud:'Low',  note:'You do not speak the local language',    special:'language'   },
+  fontega: { name:'Fontega', violence:'Low',        violLevel:'low',       eth:'Medium',              comp:'High', fraud:'Low',    note:'—',                                      special:null         },
+  keldra:  { name:'Keldra',  violence:'High, but only perpetrated by one party',         violLevel:'high', eth:'Low', comp:'High', fraud:'Low',  note:'Extensively studied in existing literature', special:'overstudied' },
+  halvena: { name:'Halvena', violence:'Low, but several attacks prevented by police',    violLevel:'low',  eth:'Low', comp:'High', fraud:'?',    fraudTrue:'High', note:'—',     special:null         },
+};
+const DISTRICT_KEYS = ['varano','halvena','mirhal','soleva','fontega','brenta','keldra','ostara'];
+
+const PAIRS = {
+  alpha: {
+    high: 'varano', low: 'soleva',
+    flaw: 'Design',
+    flawDesc: 'Varano\'s ethnic polarization is currently <strong>unknown</strong> — it could not be established from available pre-fieldwork sources. Electoral competitiveness and fraud match well, but if Varano\'s ethnic polarization turns out to differ from Soleva\'s, this comparison would carry a confounding variable. You are proceeding under genuine informational uncertainty about a key control — a realistic and common situation in qualitative research.',
+  },
+  beta: {
+    high: 'mirhal', low: 'brenta',
+    flaw: 'Ethics',
+    flawDesc: 'Mirhal\'s extreme violence — including documented state repression — creates <strong>serious ethical and safety challenges</strong>. Conducting fieldwork here puts you and your informants at significant personal risk. Before proceeding, you will need a comprehensive safety plan and careful consultation with your institution\'s ethics board. On the methodological side, the two districts are well matched: both score high on ethnic polarization and electoral fraud, making this the cleanest comparative design available — if the ethical constraints could be resolved.',
+  },
+  gamma: {
+    high: 'ostara', low: 'fontega',
+    flaw: 'Feasibility',
+    flawDesc: 'You don\'t speak the local language in Ostara. This <strong>language barrier</strong> constrains the depth of your data collection — you\'ll depend on interpreters, limiting your ability to conduct truly open-ended interviews and pick up on nuance, tone, and locally-embedded meaning. Additionally, Ostara\'s ethnic polarization is unknown, so you cannot fully confirm that this key control variable matches Fontega\'s.',
+  },
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  currentScreen: 'screen-learning-outcomes',
+  progressStep: 0,
+  groupMembers: [],
+  // Stage 1
+  s1Selected: [],
+  chosenPair: null,       // 'alpha'|'beta'|'gamma'
+  highDistrict: null,
+  lowDistrict: null,
+  // Stage 2
+  s2aSelected: null,
+  s2bSelected: null,
+  s2cSelected: null,
+  // Stage 3
+  s3District: null,
+  // Stage 4
+  fieldworkStart: null,   // 'high'|'low'
+  // Stage 7 — random party strength values
+  psValues: {},
+  // All text answers
+  answers: {
+    s3reason: '', s4reflection: '',
+    s5averify: '', s5bimplications: '',
+    s6crisis: '', s7conclusions: '',
+  },
+};
+
+/* MCQ data -------------------------------------------------- */
+const MCQ_2A = [
+  { id:'a', text:'The design allows us to make causal claims that generalize to all electoral districts in the country, regardless of their political or social context.',                   correct: false },
+  { id:'b', text:'By selecting two districts that are similar on several background conditions, we make it easier to attribute differences in violence to differences in party strength — the background noise is reduced.', correct: true  },
+  { id:'c', text:'A two-case comparison guarantees that all alternative explanations are ruled out, since the cases are matched on every variable except the one we care about.',      correct: false },
+  { id:'d', text:'The comparative design eliminates the need to think carefully about rival hypotheses, because the matched structure does that work for us automatically.',           correct: false },
+];
+
+const MCQ_2B = {
+  alpha: [
+    { id:'a', text:'The two districts are geographically too distant from each other for the comparison to be meaningful — proximity is a prerequisite for a valid MSSD.',                                              correct: false },
+    { id:'b', text:'No comparative design using only two cases can generate causal insights — a minimum of four cases is required for results to be taken seriously.',                                                  correct: false },
+    { id:'c', text:'Varano\'s ethnic polarization could not be established from pre-fieldwork sources — it is unknown. Ethnic polarization could independently drive electoral violence, meaning we cannot be sure whether differences in violence reflect party strength or ethnic context.', correct: true  },
+    { id:'d', text:'Both districts have experienced some level of electoral fraud, which contaminates the outcome measure and makes it impossible to isolate the true level of violence.',                               correct: false },
+  ],
+  beta: [
+    { id:'a', text:'Mirhal and Brenta differ substantially on their levels of electoral fraud, which introduces a confounding variable and undermines the logic of the comparison.',                                     correct: false },
+    { id:'b', text:'Brenta has been so thoroughly covered in the existing literature that it is nearly impossible to generate an original contribution by including it in a new study.',                                correct: false },
+    { id:'c', text:'The two cases are nearly identical on all observable variables, leaving too little variation to generate any meaningful causal inference.',                                                         correct: false },
+    { id:'d', text:'Conducting fieldwork in Mirhal — where state repression is part of the violence — creates serious risks for the researcher and for informants, raising questions about what research can be ethically justified in that context.', correct: true  },
+  ],
+  gamma: [
+    { id:'a', text:'Fontega and Ostara are too similar on background conditions to sustain a meaningful comparison — there is simply not enough structural variation between them to learn anything.',                   correct: false },
+    { id:'b', text:'Not speaking the language of Ostara limits the depth of data collection — it constrains your ability to conduct interviews without interpreters, understand subtleties, and build trust with local informants.', correct: true  },
+    { id:'c', text:'Both districts score high on electoral competitiveness, which creates a confound that makes it impossible to isolate the effect of party strength on violence.',                                     correct: false },
+    { id:'d', text:'Ostara has already been the subject of so much published research that fieldwork there can no longer generate original findings — the case is analytically exhausted.',                             correct: false },
+  ],
+};
+
+const SINGLE_CASE_FEEDBACK = {
+  keldra:  '<strong>An interesting choice — with an important caveat.</strong> Keldra experienced high electoral violence, but concentrated in the actions of a single party rather than spread across the political landscape. This within-case variation — one party choosing violence, others abstaining — could be analytically productive: what organizational or incentive-based differences explain why one actor escalated while others did not? That is a question a single-case study is well placed to investigate. The caveat is that Keldra is one of the most extensively studied districts in the existing literature. Before committing, you should ask honestly whether your research can add something genuinely new to what has already been argued.',
+  halvena: '<strong>A particularly compelling choice.</strong> Halvena experienced planned attacks on election-related targets — yet violence was ultimately prevented through police intervention. This satisfies the plausibility principle: the conditions for violence were present, which means the absence of actual violence is something that requires explanation rather than being taken for granted. A single-case study here offers a rare opportunity to study the <em>prevention</em> of violence rather than its occurrence: what mechanisms enabled intervention? What blocked escalation? This kind of analysis can be just as theoretically productive as studying cases where violence did break out.',
+  mirhal:  '<strong>A high-intensity case for studying violent processes.</strong> Mirhal offers unusually rich material for tracing the causal processes that produce electoral violence at its most severe. With documented state repression alongside organized party-linked violence, a single-case study could examine how institutional actors and political organizations interact to produce escalation — the kind of fine-grained process evidence that is difficult to recover from comparative designs alone. Two limitations are worth acknowledging: extreme cases are often poor candidates for generalization, and the safety challenges facing any researcher working in Mirhal do not disappear simply because you are conducting a single-case study.',
+  varano:  '<strong>A useful case for tracing the causal process.</strong> Varano experienced high levels of electoral violence, making it a productive site for process tracing. A single-case study could examine the sequence of events, the actors involved, and the mechanisms that allowed conflict to escalate — providing fine-grained evidence about how violence comes about in practice. The key limitation of this design: without a comparison case, it is difficult to establish what distinguishes Varano from districts where violence did not occur.',
+  soleva:  '<strong>A less analytically productive choice.</strong> Soleva shows low electoral violence, and its background conditions — moderate ethnic polarization, low electoral competitiveness — do not create a strong theoretical expectation of violence in the first place. Because neither the context nor the theory predicts violence here, and none occurred, there is limited analytical leverage in studying it as a single case. You would largely be confirming an expected absence rather than explaining a puzzle. A case where violence was unexpected, or where its absence is surprising given the conditions, would give you considerably more to work with.',
+  brenta:  '<strong>A deviant case with real analytical leverage.</strong> Brenta combines high ethnic polarization, high electoral fraud, and low violence — a pattern that cuts against expectations. Under most theories, including Fjelde\'s, these background conditions should create fertile ground for electoral violence. That it does not occur here makes Brenta a genuinely puzzling case. A single-case study could investigate what is suppressing violence despite the structural conditions that typically enable it — perhaps effective party organization, local elite bargains, or active policing. This is exactly the kind of anomaly that can push theory forward.',
+  ostara:  '<strong>A potentially informative case for understanding violent processes.</strong> Ostara experienced high electoral violence, making it a useful site for tracing the causal mechanisms that lead to conflict. The language barrier that complicates a comparative design is less decisive in a single-case study — with sufficient preparation and investment in local relationships, it can be managed. Ostara\'s ethnic polarization also remains unknown: fieldwork offers the opportunity to establish that value, which could sharpen the interpretation of why violence occurred in this particular setting.',
+  fontega: '<strong>A less analytically productive choice.</strong> Fontega shows low electoral violence, and its background conditions do not generate a strong theoretical expectation of violence. As with Soleva, the absence of violence here is not particularly surprising — which means there is limited analytical traction for a single-case study. You would be confirming an expected absence rather than investigating a puzzle. A case with more unexpected features would give you considerably more to work with.',
+};
+
+/* ============================================================
+   NAVIGATION & PROGRESS
+   ============================================================ */
+const SCREEN_STEPS = {
+  'screen-learning-outcomes': 0, 'screen-group': 0, 'screen-intro': 0,
+  'screen-s1':  1, 'screen-s2a': 2, 'screen-s2b': 2, 'screen-s2c': 2,
+  'screen-s3':  3, 'screen-s4':  4, 'screen-s5a': 5, 'screen-s5b': 5,
+  'screen-s6':  6, 'screen-s7':  7,
+};
+
+function goTo(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0, 0);
+  state.currentScreen = screenId;
+  updateProgress(SCREEN_STEPS[screenId] || 0);
+  onEnterScreen(screenId);
+}
+
+function updateProgress(step) {
+  state.progressStep = step;
+  for (let i = 1; i <= 7; i++) {
+    const el = document.getElementById('ps' + i);
+    el.classList.remove('active', 'done');
+    if (i < step)  el.classList.add('done');
+    if (i === step) el.classList.add('active');
+  }
+}
+
+function onEnterScreen(id) {
+  if (id === 'screen-s2a') buildS2A();
+  if (id === 'screen-s2b') buildS2B();
+  if (id === 'screen-s3')  buildS3Table();
+  if (id === 'screen-s4')  buildS4Labels();
+  if (id === 'screen-s6')  buildS6Narrative();
+  if (id === 'screen-s7')  buildS7Table();
+}
+
+/* ============================================================
+   BADGE HELPERS
+   ============================================================ */
+function violBadge(d) {
+  const cls = { 'very-high':'bvh', high:'bh', low:'bl' }[d.violLevel] || 'bm';
+  return `<span class="badge badge-viol ${cls}">${d.violence}</span>`;
+}
+function lvlBadge(val) {
+  const v = val.toLowerCase();
+  const cls = v==='high'?'bh' : v==='low'?'bl' : v==='very high'?'bvh' : 'bm';
+  return `<span class="badge ${cls}">${val}</span>`;
+}
+
+/* ============================================================
+   BUILD TABLES
+   ============================================================ */
+function buildDistrictTable(containerId, mode /* 'pair'|'single' */) {
+  const wrap = document.getElementById(containerId);
+  let html = `<table class="ct"><thead><tr>
+    <th>District</th>
+    <th>Electoral Violence</th>
+    <th>Ethnic Polarization</th>
+    <th>Competitiveness</th>
+    <th>Electoral Fraud</th>
+    <th>Party Strength</th>
+    <th>Comments</th>
+  </tr></thead><tbody>`;
+  DISTRICT_KEYS.forEach(k => {
+    const d = DISTRICTS[k];
+    const ethCell  = d.eth   === '?' ? `<span class="badge-unknown">?</span>` : lvlBadge(d.eth);
+    const compCell = d.comp  === '?' ? `<span class="badge-unknown">?</span>` : lvlBadge(d.comp);
+    const fraudCell= d.fraud === '?' ? `<span class="badge-unknown">?</span>` : lvlBadge(d.fraud);
+    html += `<tr id="drow-${mode}-${k}" onclick="toggleDistrict('${mode}','${k}')">
+      <td class="dn"><span class="sel-mark">${mode==='pair'?'✓':'●'}</span>${d.name}</td>
+      <td>${violBadge(d)}</td>
+      <td${d.eth   === '?' ? ' class="cell-unknown"' : ''}>${ethCell}</td>
+      <td${d.comp  === '?' ? ' class="cell-unknown"' : ''}>${compCell}</td>
+      <td${d.fraud === '?' ? ' class="cell-unknown"' : ''}>${fraudCell}</td>
+      <td><span class="badge bn">?</span></td>
+      <td class="district-note">${d.note}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+function toggleDistrict(mode, key) {
+  if (mode === 'pair') {
+    const idx = state.s1Selected.indexOf(key);
+    if (idx > -1) {
+      state.s1Selected.splice(idx, 1);
+      document.getElementById(`drow-pair-${key}`).classList.remove('row-selected');
+    } else if (state.s1Selected.length < 2) {
+      state.s1Selected.push(key);
+      document.getElementById(`drow-pair-${key}`).classList.add('row-selected');
+    }
+    const n = state.s1Selected.length;
+    document.getElementById('s1-count').textContent = n;
+    document.getElementById('s1-count-label').textContent =
+      n === 2 ? 'districts selected — ready to analyze' : 'districts selected (select exactly 2)';
+    document.getElementById('s1-analyze-btn').disabled = (n !== 2);
+    // Hide old feedback when changing selection
+    hide('s1-fb-success'); hide('s1-fb-error');
+  } else if (mode === 'single') {
+    if (state.s3District) {
+      const prev = document.getElementById(`drow-single-${state.s3District}`);
+      if (prev) prev.classList.remove('row-single');
+    }
+    state.s3District = key;
+    document.getElementById(`drow-single-${key}`).classList.add('row-single');
+    document.getElementById('s3-ft-section').style.display = 'block';
+  }
+}
+
+/* ============================================================
+   STAGE 1: PAIR ANALYSIS
+   ============================================================ */
+function analyzeS1Pair() {
+  hide('s1-fb-success'); hide('s1-fb-error');
+  const [d1, d2] = state.s1Selected;
+  const pairKey = detectPair(d1, d2);
+  if (pairKey) {
+    const pair = PAIRS[pairKey];
+    state.chosenPair   = pairKey;
+    state.highDistrict = pair.high;
+    state.lowDistrict  = pair.low;
+    document.getElementById('s1-fb-success-title').innerHTML =
+      `✓ Valid pair: ${DISTRICTS[pair.high].name} &amp; ${DISTRICTS[pair.low].name}`;
+    document.getElementById('s1-fb-success-body').innerHTML =
+      `<p>Good work — this pair gives you the variation you need in your outcome (electoral violence). The comparison is grounded and defensible — but like all research designs, it comes with trade-offs.</p>
+       <p>No comparative design is perfect. The mark of a good researcher is not eliminating all limitations — it's knowing what you've accepted, and why. You'll reflect on that in the next section.</p>`;
+    show('s1-fb-success');
+  } else {
+    const fb = getWrongPairFeedback(d1, d2);
+    document.getElementById('s1-fb-error-body').innerHTML = `<p>${fb}</p>`;
+    show('s1-fb-error');
+  }
+}
+
+function detectPair(d1, d2) {
+  const sel = [d1, d2].sort().join('+');
+  for (const [k, p] of Object.entries(PAIRS)) {
+    if ([p.high, p.low].sort().join('+') === sel) return k;
+  }
+  return null;
+}
+
+function getWrongPairFeedback(d1, d2) {
+  const v1 = DISTRICTS[d1].violLevel, v2 = DISTRICTS[d2].violLevel;
+  const isHigh = v => v === 'high' || v === 'very-high';
+
+  if (isHigh(v1) && isHigh(v2)) {
+    return `Both <strong>${DISTRICTS[d1].name}</strong> and <strong>${DISTRICTS[d2].name}</strong> show high levels of electoral violence. A comparative design requires variation in your outcome — without it, there is nothing to explain. You need one high-violence and one low-violence district. Try again.`;
+  }
+  if (v1 === 'low' && v2 === 'low') {
+    return `Both <strong>${DISTRICTS[d1].name}</strong> and <strong>${DISTRICTS[d2].name}</strong> show low levels of electoral violence. The same principle applies: you need variation in the outcome. Without it, your design has nothing to explain. Select one high-violence and one low-violence district.`;
+  }
+  const sorted = [d1, d2].sort().join('+');
+  if (sorted === 'brenta+ostara') {
+    return `Brenta and Ostara have the right variation in electoral violence — but look more carefully at the control variables. They differ on electoral fraud (High vs. Low), which introduces a potential confound. More critically, Ostara's ethnic polarization is unknown. Ethnic polarization is one of the most consistently cited alternative explanations for electoral violence, and proceeding without knowing Ostara's value means you cannot rule out ethnicity as the true driver of any violence difference you observe. That uncertainty is too consequential to accept.`;
+  }
+
+  if (d1 === 'keldra' || d2 === 'keldra') {
+    const partner = d1 === 'keldra' ? d2 : d1;
+    if (DISTRICTS[partner].violLevel === 'low') {
+      return `<strong>${DISTRICTS['keldra'].name}</strong> does give you the right variation in electoral violence — but it has been so extensively studied in the existing literature that pairing it here risks producing findings that merely replicate what others have already argued. Making an original scholarly contribution requires more than confirming what is already known. Is there a less-studied district that would serve your comparison equally well?`;
+    }
+  }
+  // Cross-DV pair: identify high- and low-violence districts
+  const hD = isHigh(v1) ? d1 : d2;
+  const lD = v1 === 'low' ? d1 : d2;
+  const hDist = DISTRICTS[hD], lDist = DISTRICTS[lD];
+
+  // Check for deceptively clean pairs involving Varano (unknown eth) or Halvena (unknown fraud)
+  // that appear to match on all visible covariates
+  const ethKnownMismatch  = hDist.eth   !== '?' && lDist.eth   !== '?' && hDist.eth   !== lDist.eth;
+  const compKnownMismatch = hDist.comp  !== '?' && lDist.comp  !== '?' && hDist.comp  !== lDist.comp;
+  const fraudKnownMismatch= hDist.fraud !== '?' && lDist.fraud !== '?' && hDist.fraud !== lDist.fraud;
+  const hasUnknown = hDist.eth === '?' || lDist.eth === '?' || hDist.fraud === '?' || lDist.fraud === '?';
+  const visibleConfounders = [];
+  if (ethKnownMismatch)   visibleConfounders.push('ethnic polarization');
+  if (compKnownMismatch)  visibleConfounders.push('electoral competitiveness');
+  if (fraudKnownMismatch) visibleConfounders.push('electoral fraud');
+
+  if (visibleConfounders.length === 0 && hasUnknown) {
+    // Looks clean but has hidden uncertainty — specific warning
+    const unknownItems = [];
+    if (hDist.eth === '?' || lDist.eth === '?')   unknownItems.push('ethnic polarization');
+    if (hDist.fraud === '?' || lDist.fraud === '?') unknownItems.push('electoral fraud');
+    return `<strong>${hDist.name}</strong> and <strong>${lDist.name}</strong> appear to match on all visible covariates — but ${unknownItems.join(' and ')} ${unknownItems.length > 1 ? 'are' : 'is'} unknown for one of these districts. An unknown value is not the same as a confirmed match: you cannot verify that the comparison is actually clean on this dimension. Selecting a case pair requires being able to establish equivalence on key control variables, not simply hoping the hidden value might be convenient. This is exactly the kind of uncertainty that can undermine a comparative design.`;
+  }
+
+  if (visibleConfounders.length >= 2) {
+    return `<strong>${hDist.name}</strong> and <strong>${lDist.name}</strong> have the right variation in your outcome, but they differ on <em>${visibleConfounders.join(' and ')}</em> as well. With this many confounders, isolating the effect of party strength becomes very difficult — there are simply too many alternative explanations competing for the same variation. A most-similar systems design works best when the cases are alike on everything except the key independent variable. Look for a cleaner pair.`;
+  }
+  return `This combination doesn't provide the cleanest basis for comparison. Look carefully at how similar your two districts are on the control variables — and whether the variation in your outcome is large enough and clean enough to support the comparison you have in mind.`;
+}
+
+/* ============================================================
+   STAGE 2: MCQ
+   ============================================================ */
+function pairBannerHTML() {
+  if (!state.chosenPair) return '';
+  const p = PAIRS[state.chosenPair];
+  return `<strong>Your chosen pair:</strong> ${DISTRICTS[p.high].name} (high violence) + ${DISTRICTS[p.low].name} (low violence) &mdash; Flaw accepted: ${p.flaw}`;
+}
+
+function buildMCQOptions(containerId, options, stateKey) {
+  const wrap = document.getElementById(containerId);
+  wrap.innerHTML = options.map(o =>
+    `<button class="mcq-option" id="${containerId}-${o.id}" onclick="selectMCQ('${stateKey}','${o.id}','${containerId}')">
+       <span class="opt-label">${o.id.toUpperCase()}</span>
+       <span>${o.text}</span>
+     </button>`
+  ).join('');
+}
+
+function selectMCQ(stateKey, choice, containerId) {
+  state[stateKey + 'Selected'] = choice;
+  // Deselect all in the container
+  if (!containerId) containerId = stateKey; // fallback for s2c direct calls
+  document.querySelectorAll(`#${containerId} .mcq-option, .mcq-option[id^="${stateKey}-"]`).forEach(b => {
+    b.classList.remove('selected');
+  });
+  const btn = document.getElementById(`${containerId || stateKey}-${choice}`) ||
+              document.getElementById(`${stateKey}-${choice}`);
+  if (btn) btn.classList.add('selected');
+}
+
+function buildS2A() {
+  document.getElementById('s2a-pair-banner').innerHTML = pairBannerHTML();
+  state.s2aSelected = null;
+  document.getElementById('s2a-next-row').style.display = 'none';
+  hide('s2a-feedback');
+  buildMCQOptions('s2a-options', MCQ_2A, 's2a');
+}
+
+function checkS2A() {
+  if (!state.s2aSelected) return;
+  const correct = MCQ_2A.find(o => o.id === state.s2aSelected).correct;
+  MCQ_2A.forEach(o => {
+    const btn = document.getElementById(`s2a-options-${o.id}`);
+    btn.classList.remove('selected','correct','incorrect');
+    if (o.id === state.s2aSelected) btn.classList.add(o.correct ? 'correct' : 'incorrect');
+  });
+  const fb = document.getElementById('s2a-feedback');
+  fb.className = 'feedback vis ' + (correct ? 'fb-success' : 'fb-error');
+  fb.innerHTML = correct
+    ? `<div class="fb-title">✓ Correct</div><p>That's right. The core strength of a most-similar systems design is its ability to control for background conditions by selecting similar cases — allowing you to attribute differences in the outcome primarily to differences in the independent variable.</p>`
+    : `<div class="fb-title">✗ Not quite</div><p>Think about what the most-similar systems logic is designed to achieve. When cases are similar on most background conditions but differ on the IV and the DV, what does that allow you to argue? Try again.</p>`;
+  if (correct) document.getElementById('s2a-next-row').style.display = 'flex';
+}
+
+function buildS2B() {
+  document.getElementById('s2b-pair-banner').innerHTML = pairBannerHTML();
+  state.s2bSelected = null;
+  document.getElementById('s2b-next-row').style.display = 'none';
+  hide('s2b-feedback');
+  const opts = MCQ_2B[state.chosenPair] || MCQ_2B.gamma;
+  buildMCQOptions('s2b-options', opts, 's2b');
+}
+
+function checkS2B() {
+  if (!state.s2bSelected) return;
+  const opts = MCQ_2B[state.chosenPair] || MCQ_2B.gamma;
+  const correct = opts.find(o => o.id === state.s2bSelected).correct;
+  opts.forEach(o => {
+    const btn = document.getElementById(`s2b-options-${o.id}`);
+    btn.classList.remove('selected','correct','incorrect');
+    if (o.id === state.s2bSelected) btn.classList.add(o.correct ? 'correct' : 'incorrect');
+  });
+  const fb = document.getElementById('s2b-feedback');
+  fb.className = 'feedback vis ' + (correct ? 'fb-success' : 'fb-error');
+  fb.innerHTML = correct
+    ? `<div class="fb-title">✓ Correct</div><p>Exactly. A good researcher enters the field knowing the specific limitation of their design — and has a plan for managing it. Acknowledging this limitation explicitly is a sign of methodological maturity, not weakness.</p>`
+    : `<div class="fb-title">✗ Not quite</div><p>Think about the specific limitation you accepted when you chose this pair. What was the methodological flaw you identified in Stage 1? That flaw is the core limitation of your design. Try again.</p>`;
+  if (correct) document.getElementById('s2b-next-row').style.display = 'flex';
+}
+
+// S2c MCQ uses simple ID scheme (s2c-a through s2c-d) defined in static HTML
+function checkS2C() {
+  if (!state.s2cSelected) return;
+  const correct = state.s2cSelected === 'c';
+  ['a','b','c','d'].forEach(ch => {
+    const btn = document.getElementById(`s2c-${ch}`);
+    btn.classList.remove('selected','correct','incorrect');
+    if (ch === state.s2cSelected) btn.classList.add(correct ? 'correct' : 'incorrect');
+  });
+  const fb = document.getElementById('s2c-feedback');
+  fb.className = 'feedback vis ' + (correct ? 'fb-success' : 'fb-error');
+  fb.innerHTML = correct
+    ? `<div class="fb-title">✓ Correct — Most-Similar Systems Design (MSSD)</div><p>This is the logic behind your case selection: find cases that are alike on background conditions but differ on the independent variable and the outcome. By holding context constant, you make it more plausible that the IV — party strength — explains the difference in electoral violence.</p>`
+    : `<div class="fb-title">✗ Not quite</div><p>You've selected cases that are similar on most background conditions, but differ on party strength (IV) and electoral violence (DV). Which design logic does that correspond to? Try again.</p>`;
+  if (correct) document.getElementById('s2c-next-row').style.display = 'flex';
+}
+
+/* ============================================================
+   STAGE 3: SINGLE CASE
+   ============================================================ */
+function buildS3Table() {
+  state.s3District = null;
+  document.getElementById('s3-ft-section').style.display = 'none';
+  hide('s3-feedback');
+  document.getElementById('s3-next-row').style.display = 'none';
+  buildDistrictTable('s3-table-wrap', 'single');
+}
+
+function submitS3() {
+  const text = document.getElementById('s3-text').value.trim();
+  if (!text) { alert('Please write your group\'s reasoning before submitting.'); return; }
+  if (!state.s3District) { alert('Please select a district first.'); return; }
+  state.answers.s3reason = text;
+  const d = DISTRICTS[state.s3District];
+  const fb = SINGLE_CASE_FEEDBACK[state.s3District] || '<strong>Interesting choice.</strong> Think carefully about what type of case this is and what analytical leverage it offers.';
+  const el = document.getElementById('s3-feedback');
+  el.className = 'feedback vis fb-info';
+  el.innerHTML = `<div class="fb-title">&#9654; On ${d.name} as a single case</div><p>${fb}</p>`;
+  document.getElementById('s3-next-row').style.display = 'flex';
+}
+
+/* ============================================================
+   STAGE 4: FIELDWORK
+   ============================================================ */
+function buildS4Labels() {
+  if (!state.chosenPair) return;
+  const p = PAIRS[state.chosenPair];
+  const hN = DISTRICTS[p.high].name;
+  const lN = DISTRICTS[p.low].name;
+  document.getElementById('fw-high-label').textContent = hN;
+  document.getElementById('fw-high-sub').textContent   = 'High electoral violence';
+  document.getElementById('fw-low-label').textContent  = lN;
+  document.getElementById('fw-low-sub').textContent    = 'Low electoral violence';
+  // Reset state
+  state.fieldworkStart = null;
+  document.getElementById('s4-ft-section').style.display = 'none';
+  document.getElementById('fw-high-btn').classList.remove('chosen');
+  document.getElementById('fw-low-btn').classList.remove('chosen');
+}
+
+function chooseFieldwork(which) {
+  state.fieldworkStart = which;
+  document.getElementById('fw-high-btn').classList.toggle('chosen', which === 'high');
+  document.getElementById('fw-low-btn').classList.toggle('chosen',  which === 'low');
+  const p   = PAIRS[state.chosenPair];
+  const dKey = which === 'high' ? p.high : p.low;
+  const label = DISTRICTS[dKey].name + ' (' + (which === 'high' ? 'high' : 'low') + ' violence)';
+  document.getElementById('s4-chosen-label').textContent = label;
+  document.getElementById('s4-ft-section').style.display = 'block';
+}
+
+function submitS4() {
+  const text = document.getElementById('s4-text').value.trim();
+  if (!text) { alert('Please write your group\'s reflection before submitting.'); return; }
+  state.answers.s4reflection = text;
+  goTo('screen-s5a');
+}
+
+/* ============================================================
+   STAGE 5: UNIQUENESS
+   ============================================================ */
+function submitS5A() {
+  const text = document.getElementById('s5a-text').value.trim();
+  if (!text) { alert('Please write your group\'s response before submitting.'); return; }
+  state.answers.s5averify = text;
+  goTo('screen-s5b');
+}
+
+function submitS5B() {
+  const text = document.getElementById('s5b-text').value.trim();
+  if (!text) { alert('Please write your group\'s response before submitting.'); return; }
+  state.answers.s5bimplications = text;
+  goTo('screen-s6');
+}
+
+/* ============================================================
+   STAGE 6: CRISIS
+   ============================================================ */
+function buildS6Narrative() {
+  if (!state.chosenPair) return;
+  const hN = DISTRICTS[PAIRS[state.chosenPair].high].name;
+  document.getElementById('s6-district-name').textContent = hN;
+}
+
+function submitS6() {
+  const text = document.getElementById('s6-text').value.trim();
+  if (!text) { alert('Please write your group\'s response before submitting.'); return; }
+  state.answers.s6crisis = text;
+  goTo('screen-s7');
+}
+
+/* ============================================================
+   STAGE 7: FINAL RESULTS
+   ============================================================ */
+const PS_OPTIONS = ['Low', 'Medium', 'High', 'Low → High (over time)'];
+function randomPS() { return PS_OPTIONS[Math.floor(Math.random() * PS_OPTIONS.length)]; }
+
+function buildS7Table() {
+  if (!state.chosenPair) return;
+  const p   = PAIRS[state.chosenPair];
+  // Assign random party strength values once
+  if (!state.psValues[p.high]) {
+    state.psValues[p.high] = randomPS();
+    state.psValues[p.low]  = randomPS();
+  }
+  const hD = DISTRICTS[p.high];
+  const lD = DISTRICTS[p.low];
+  const psH = state.psValues[p.high];
+  const psL = state.psValues[p.low];
+  const psBadgeH = lvlBadge(psH.replace(' (over time)','').split(' → ')[0]);  // rough badge
+  const psBadgeL = lvlBadge(psL.replace(' (over time)','').split(' → ')[0]);
+
+  const wrap = document.getElementById('s7-table-wrap');
+  // Resolve true values for any unknown covariates
+  const hEth   = hD.eth   === '?' ? hD.ethTrue   || '?' : hD.eth;
+  const hFraud = hD.fraud === '?' ? hD.fraudTrue || '?' : hD.fraud;
+  const lEth   = lD.eth   === '?' ? lD.ethTrue   || '?' : lD.eth;
+  const lFraud = lD.fraud === '?' ? lD.fraudTrue || '?' : lD.fraud;
+
+  const trueReveals = [];
+  if (hD.ethTrue)   trueReveals.push(`<strong>${hD.name} — Ethnic Polarization:</strong> ${hD.ethTrue} <em>(was unknown at selection stage)</em>`);
+  if (lD.ethTrue)   trueReveals.push(`<strong>${lD.name} — Ethnic Polarization:</strong> ${lD.ethTrue} <em>(was unknown at selection stage)</em>`);
+  if (hD.fraudTrue) trueReveals.push(`<strong>${hD.name} — Electoral Fraud:</strong> ${hD.fraudTrue} <em>(was unknown at selection stage)</em>`);
+  if (lD.fraudTrue) trueReveals.push(`<strong>${lD.name} — Electoral Fraud:</strong> ${lD.fraudTrue} <em>(was unknown at selection stage)</em>`);
+
+  const revealPanel = trueReveals.length ? `
+  <div class="card card-accent" style="margin-top:16px;">
+    <h3>Hidden covariates — now revealed</h3>
+    <p>Your fieldwork established the true values for variables that were unknown at the design stage:</p>
+    <ul style="margin:10px 0 0 20px; line-height:2.1;">${trueReveals.map(r => `<li>${r}</li>`).join('')}</ul>
+  </div>` : '';
+
+  wrap.innerHTML = `
+  <table class="ct">
+    <thead><tr>
+      <th>District</th>
+      <th>Party Strength (IV)</th>
+      <th>Electoral Violence</th>
+      <th>Ethnic Polarization</th>
+      <th>Electoral Competitiveness</th>
+      <th>Electoral Fraud</th>
+    </tr></thead>
+    <tbody>
+      <tr class="results-row-high">
+        <td class="dn">${hD.name}</td>
+        <td><span class="badge bm">${psH}</span></td>
+        <td>${violBadge(hD)}</td>
+        <td>${lvlBadge(hEth)}</td>
+        <td>${lvlBadge(hD.comp)}</td>
+        <td>${lvlBadge(hFraud)}</td>
+      </tr>
+      <tr class="results-row-low">
+        <td class="dn">${lD.name}</td>
+        <td><span class="badge bm">${psL}</span></td>
+        <td>${violBadge(lD)}</td>
+        <td>${lvlBadge(lEth)}</td>
+        <td>${lvlBadge(lD.comp)}</td>
+        <td>${lvlBadge(lFraud)}</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="muted" style="margin: 8px 12px 10px;">Party strength values are revealed based on your fieldwork findings.</p>
+  ${revealPanel}`;
+}
+
+function submitS7() {
+  const text = document.getElementById('s7-text').value.trim();
+  if (!text) { alert('Please write your group\'s conclusions before submitting.'); return; }
+  state.answers.s7conclusions = text;
+  document.getElementById('s7-dl-section').style.display = 'block';
+  document.getElementById('s7-dl-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+/* ============================================================
+   GROUP MEMBERS
+   ============================================================ */
+function submitGroup() {
+  const members = [1,2,3,4,5]
+    .map(i => document.getElementById('gm' + i).value.trim())
+    .filter(Boolean);
+  if (members.length === 0) {
+    alert('Please enter at least one group member name.');
+    return;
+  }
+  state.groupMembers = members;
+  goTo('screen-intro');
+}
+
+/* ============================================================
+   DOWNLOAD AS PDF
+   ============================================================ */
+function downloadAnswers() {
+  const p     = state.chosenPair ? PAIRS[state.chosenPair] : null;
+  const hN    = p ? DISTRICTS[p.high].name : '—';
+  const lN    = p ? DISTRICTS[p.low].name  : '—';
+  const hDist = p ? DISTRICTS[p.high] : null;
+  const lDist = p ? DISTRICTS[p.low]  : null;
+  const psH   = state.psValues[p?.high] || '—';
+  const psL   = state.psValues[p?.low]  || '—';
+  const s3N   = state.s3District ? DISTRICTS[state.s3District].name : '—';
+  const fw    = state.fieldworkStart
+    ? (state.fieldworkStart === 'high' ? hN + ' (high violence)' : lN + ' (low violence)')
+    : '—';
+  const mcq2a = MCQ_2A.find(o => o.id === state.s2aSelected)?.text || '—';
+  const mcq2b = (() => {
+    const opts = MCQ_2B[state.chosenPair] || [];
+    return opts.find(o => o.id === state.s2bSelected)?.text || '—';
+  })();
+  const mcq2c = {
+    a: 'Most-Different Systems Design (MDSD)',
+    b: 'Structured Focused Comparison',
+    c: 'Most-Similar Systems Design (MSSD)',
+    d: 'Single-case process tracing',
+  }[state.s2cSelected] || '—';
+  const members = state.groupMembers.length ? state.groupMembers.join(', ') : '(not recorded)';
+  const date    = new Date().toLocaleDateString('en-GB', {year:'numeric', month:'long', day:'numeric'});
+
+  // Build revealed covariate rows for Stage 7
+  const revealRows = [];
+  if (hDist?.ethTrue)   revealRows.push(`<li><strong>${hN} — Ethnic Polarization:</strong> ${hDist.ethTrue} <em>(was unknown at selection)</em></li>`);
+  if (lDist?.ethTrue)   revealRows.push(`<li><strong>${lN} — Ethnic Polarization:</strong> ${lDist.ethTrue} <em>(was unknown at selection)</em></li>`);
+  if (hDist?.fraudTrue) revealRows.push(`<li><strong>${hN} — Electoral Fraud:</strong> ${hDist.fraudTrue} <em>(was unknown at selection)</em></li>`);
+  if (lDist?.fraudTrue) revealRows.push(`<li><strong>${lN} — Electoral Fraud:</strong> ${lDist.fraudTrue} <em>(was unknown at selection)</em></li>`);
+  const revealHTML = revealRows.length
+    ? `<p><strong>Hidden covariates revealed during fieldwork:</strong></p><ul>${revealRows.join('')}</ul>` : '';
+
+  function esc(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Seminar Notes — ${date}</title>
+<style>
+  body { font-family: Georgia, serif; font-size: 13px; line-height: 1.75; color: #111;
+         max-width: 680px; margin: 40px auto; padding: 0 24px; }
+  h1   { font-size: 19px; color: #1c1c1c; border-bottom: 2px solid #1c1c1c;
+         padding-bottom: 8px; margin-bottom: 4px; }
+  .meta { color: #666; font-size: 11.5px; margin-bottom: 28px; }
+  h2   { font-size: 13px; font-weight: 700; color: #1c1c1c; margin: 24px 0 2px;
+         border-left: 3px solid #c08030; padding-left: 9px; text-transform: uppercase;
+         letter-spacing: 0.05em; }
+  .answer { background: #f6f3ec; border-left: 3px solid #c8b89c; padding: 8px 12px;
+             margin: 6px 0 14px; white-space: pre-wrap; font-size: 12.5px; }
+  ul { margin: 6px 0 12px 20px; }
+  li { margin-bottom: 4px; }
+  hr { border: none; border-top: 1px solid #ddd; margin: 28px 0; }
+  .footer { color: #999; font-size: 11px; text-align: center; margin-top: 24px; }
+  @media print { body { margin: 20px; } }
+</style>
+</head>
+<body>
+<h1>Electoral Violence Seminar — Group Notes</h1>
+<div class="meta">Date: ${date}&nbsp;&nbsp;|&nbsp;&nbsp;Group members: ${esc(members)}</div>
+
+<h2>Stage 1 — Case Selection</h2>
+<p><strong>Chosen pair:</strong> ${esc(hN)} (high violence) + ${esc(lN)} (low violence)</p>
+${p ? `<p><strong>Flaw accepted (${esc(p.flaw)}):</strong> ${p.flawDesc.replace(/<[^>]+>/g,'')}</p>` : ''}
+
+<h2>Stage 2 — Design Reflection</h2>
+<p><strong>Q1 — Key strength (selected answer):</strong></p>
+<div class="answer">${esc(mcq2a)}</div>
+<p><strong>Q2 — Key limitation (selected answer):</strong></p>
+<div class="answer">${esc(mcq2b)}</div>
+<p><strong>Q3 — Design type:</strong> ${esc(mcq2c)}</p>
+
+<h2>Stage 3 — Single-Case Study</h2>
+<p><strong>Selected district:</strong> ${esc(s3N)}</p>
+<p><strong>Group rationale:</strong></p>
+<div class="answer">${esc(state.answers.s3reason || '(no answer recorded)')}</div>
+
+<h2>Stage 4 — Into the Field</h2>
+<p><strong>Starting district:</strong> ${esc(fw)}</p>
+<p><strong>Anticipated benefits and challenges:</strong></p>
+<div class="answer">${esc(state.answers.s4reflection || '(no answer recorded)')}</div>
+
+<h2>Stage 5A — Uniqueness: Verifying the Claim</h2>
+<div class="answer">${esc(state.answers.s5averify || '(no answer recorded)')}</div>
+
+<h2>Stage 5B — Uniqueness: Implications</h2>
+<div class="answer">${esc(state.answers.s5bimplications || '(no answer recorded)')}</div>
+
+<h2>Stage 6 — Measurement Crisis</h2>
+<div class="answer">${esc(state.answers.s6crisis || '(no answer recorded)')}</div>
+
+<h2>Stage 7 — Final Findings</h2>
+<p><strong>Party strength — ${esc(hN)}:</strong> ${esc(psH)}</p>
+<p><strong>Party strength — ${esc(lN)}:</strong> ${esc(psL)}</p>
+${revealHTML}
+<p><strong>Group conclusions:</strong></p>
+<div class="answer">${esc(state.answers.s7conclusions || '(no answer recorded)')}</div>
+
+<hr>
+<div class="footer">Electoral Violence Seminar · Qualitative Research Design</div>
+</body>
+</html>`;
+
+  const win = window.open('', '_blank');
+  if (!win) { alert('Please allow pop-ups for this page to download your notes.'); return; }
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(() => win.print(), 400);
+}
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+function show(id) { const el = document.getElementById(id); if (el) el.classList.add('vis'); }
+function hide(id) { const el = document.getElementById(id); if (el) el.classList.remove('vis'); }
+
+/* ============================================================
+   INIT
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  buildDistrictTable('s1-table-wrap', 'pair');
+});
+</script>
+<div id="page-footer">Seminar scenario created by Sebastian van Baalen</div>
+</body>
+</html>
