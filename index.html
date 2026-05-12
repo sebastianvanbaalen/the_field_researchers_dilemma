@@ -781,6 +781,7 @@ td.cell-unknown { color: var(--text-muted); }
     </div>
 
     <div id="s2a-pair-banner" class="pair-banner"></div>
+    <div class="table-wrap" id="s2a-pair-table"></div>
 
     <div class="card card-primary">
       <p>You've made your case selection. Before you pack your bags, take a moment to think clearly about what your research design can and cannot do. A good researcher knows the strengths and limitations of their approach before they enter the field — not after.</p>
@@ -812,6 +813,7 @@ td.cell-unknown { color: var(--text-muted); }
     </div>
 
     <div id="s2b-pair-banner" class="pair-banner"></div>
+    <div class="table-wrap" id="s2b-pair-table"></div>
 
     <div class="card card-primary">
       <p>Every research design involves trade-offs. The limitation you identify here should reflect the specific methodological challenge you accepted when you chose your pair. Select the answer that best captures the core limitation of your particular comparison.</p>
@@ -840,6 +842,9 @@ td.cell-unknown { color: var(--text-muted); }
       <p class="bn-sub">Name it before you claim it.</p>
       <div class="bn-deco">03</div>
     </div>
+
+    <div id="s2c-pair-banner" class="pair-banner"></div>
+    <div class="table-wrap" id="s2c-pair-table"></div>
 
     <div class="card card-primary">
       <p>You've selected two districts that are similar on most background conditions but differ on your key independent variable (party strength) and your outcome (electoral violence). There's a name for this kind of design. Which one is it?</p>
@@ -1223,6 +1228,7 @@ function updateProgress(step) {
 function onEnterScreen(id) {
   if (id === 'screen-s2a') buildS2A();
   if (id === 'screen-s2b') buildS2B();
+  if (id === 'screen-s2c') buildS2C();
   if (id === 'screen-s3')  buildS3Table();
   if (id === 'screen-s4')  buildS4Labels();
   if (id === 'screen-s6')  buildS6Narrative();
@@ -1396,6 +1402,40 @@ function pairBannerHTML() {
   return `<strong>Your chosen pair:</strong> ${DISTRICTS[p.high].name} (high violence) + ${DISTRICTS[p.low].name} (low violence) &mdash; Flaw accepted: ${p.flaw}`;
 }
 
+function buildPairTable(containerId) {
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return;
+  if (!state.chosenPair) { wrap.innerHTML = ''; return; }
+  const p = PAIRS[state.chosenPair];
+  const keys = [p.high, p.low];
+  let html = `<table class="ct"><thead><tr>
+    <th>District</th>
+    <th>Electoral Violence</th>
+    <th>Ethnic Polarization</th>
+    <th>Competitiveness</th>
+    <th>Electoral Fraud</th>
+    <th>Party Strength</th>
+    <th>Comments</th>
+  </tr></thead><tbody>`;
+  keys.forEach(k => {
+    const d = DISTRICTS[k];
+    const ethCell   = d.eth   === '?' ? `<span class="badge-unknown">?</span>` : lvlBadge(d.eth);
+    const compCell  = d.comp  === '?' ? `<span class="badge-unknown">?</span>` : lvlBadge(d.comp);
+    const fraudCell = d.fraud === '?' ? `<span class="badge-unknown">?</span>` : lvlBadge(d.fraud);
+    html += `<tr class="row-selected">
+      <td class="dn"><span class="sel-mark">✓</span>${d.name}</td>
+      <td>${violBadge(d)}</td>
+      <td${d.eth   === '?' ? ' class="cell-unknown"' : ''}>${ethCell}</td>
+      <td${d.comp  === '?' ? ' class="cell-unknown"' : ''}>${compCell}</td>
+      <td${d.fraud === '?' ? ' class="cell-unknown"' : ''}>${fraudCell}</td>
+      <td><span class="badge bn">?</span></td>
+      <td class="district-note">${d.note}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
 function buildMCQOptions(containerId, options, stateKey) {
   const wrap = document.getElementById(containerId);
   wrap.innerHTML = options.map(o =>
@@ -1420,6 +1460,7 @@ function selectMCQ(stateKey, choice, containerId) {
 
 function buildS2A() {
   document.getElementById('s2a-pair-banner').innerHTML = pairBannerHTML();
+  buildPairTable('s2a-pair-table');
   state.s2aSelected = null;
   document.getElementById('s2a-next-row').style.display = 'none';
   hide('s2a-feedback');
@@ -1442,8 +1483,14 @@ function checkS2A() {
   if (correct) document.getElementById('s2a-next-row').style.display = 'flex';
 }
 
+function buildS2C() {
+  document.getElementById('s2c-pair-banner').innerHTML = pairBannerHTML();
+  buildPairTable('s2c-pair-table');
+}
+
 function buildS2B() {
   document.getElementById('s2b-pair-banner').innerHTML = pairBannerHTML();
+  buildPairTable('s2b-pair-table');
   state.s2bSelected = null;
   document.getElementById('s2b-next-row').style.display = 'none';
   hide('s2b-feedback');
