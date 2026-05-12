@@ -624,7 +624,7 @@ td.cell-unknown { color: var(--text-muted); }
       <ul class="lo-list">
         <li>
           <span class="lo-num">1</span>
-          <span>Understand the logic and limitations of most-similar systems designs (MSSD) in qualitative comparative research, and apply these principles to a realistic case selection problem involving incomplete information and trade-offs.</span>
+          <span>Understand the logic and limitations of most-similar case selection designs in qualitative comparative research, and apply these principles to a realistic case selection problem involving incomplete information and trade-offs.</span>
         </li>
         <li>
           <span class="lo-num">2</span>
@@ -785,7 +785,7 @@ td.cell-unknown { color: var(--text-muted); }
 
     <div class="card card-primary">
       <p>You've made your case selection. Before you pack your bags, take a moment to think clearly about what your research design can and cannot do. A good researcher knows the strengths and limitations of their approach before they enter the field — not after.</p>
-      <p>Select the answer that best captures the core strength of a most-similar systems comparative design.</p>
+      <p>Select the answer that best captures the core strength of a most-similar comparative design.</p>
     </div>
 
     <div id="s2a-options"><!-- Built by JS --></div>
@@ -852,7 +852,7 @@ td.cell-unknown { color: var(--text-muted); }
 
     <button class="mcq-option" id="s2c-a" onclick="selectMCQ('s2c','a')">
       <span class="opt-label">A</span>
-      <span>Most-Different Systems Design (MDSD) — compare cases that differ on almost everything, but share the same outcome, in order to identify the common causal factor.</span>
+      <span>Most-Different Design — compare cases that differ on almost everything, but share the same outcome, in order to identify the common causal factor.</span>
     </button>
     <button class="mcq-option" id="s2c-b" onclick="selectMCQ('s2c','b')">
       <span class="opt-label">B</span>
@@ -860,7 +860,7 @@ td.cell-unknown { color: var(--text-muted); }
     </button>
     <button class="mcq-option" id="s2c-c" onclick="selectMCQ('s2c','c')">
       <span class="opt-label">C</span>
-      <span>Most-Similar Systems Design (MSSD) — compare cases that are alike on everything except the independent variable and the outcome, in order to isolate the effect of the IV.</span>
+      <span>Most-Similar Design — compare cases that are alike on everything except the independent variable and the outcome, in order to isolate the effect of the IV.</span>
     </button>
     <button class="mcq-option" id="s2c-d" onclick="selectMCQ('s2c','d')">
       <span class="opt-label">D</span>
@@ -1166,7 +1166,7 @@ const MCQ_2A = [
 
 const MCQ_2B = {
   alpha: [
-    { id:'a', text:'The two districts are geographically too distant from each other for the comparison to be meaningful — proximity is a prerequisite for a valid MSSD.',                                              correct: false },
+    { id:'a', text:'The two districts are geographically too distant from each other for the comparison to be meaningful — proximity is a prerequisite for a valid most-similar design.',                                              correct: false },
     { id:'b', text:'No comparative design using only two cases can generate causal insights — a minimum of four cases is required for results to be taken seriously.',                                                  correct: false },
     { id:'c', text:'Varano\'s ethnic polarization could not be established from pre-fieldwork sources — it is unknown. Ethnic polarization could independently drive electoral violence, meaning we cannot be sure whether differences in violence reflect party strength or ethnic context.', correct: true  },
     { id:'d', text:'Both districts have experienced some level of electoral fraud, which contaminates the outcome measure and makes it impossible to isolate the true level of violence.',                               correct: false },
@@ -1191,7 +1191,7 @@ const SINGLE_CASE_FEEDBACK = {
   mirhal:  '<strong>A high-intensity case for studying violent processes.</strong> Mirhal offers unusually rich material for tracing the causal processes that produce electoral violence at its most severe. With documented state repression alongside organized party-linked violence, a single-case study could examine how institutional actors and political organizations interact to produce escalation — the kind of fine-grained process evidence that is difficult to recover from comparative designs alone. Two limitations are worth acknowledging: extreme cases are often poor candidates for generalization, and the safety challenges facing any researcher working in Mirhal do not disappear simply because you are conducting a single-case study.',
   varano:  '<strong>A useful case for tracing the causal process.</strong> Varano experienced high levels of electoral violence, making it a productive site for process tracing. A single-case study could examine the sequence of events, the actors involved, and the mechanisms that allowed conflict to escalate — providing fine-grained evidence about how violence comes about in practice. The key limitation of this design: without a comparison case, it is difficult to establish what distinguishes Varano from districts where violence did not occur.',
   soleva:  '<strong>A less analytically productive choice.</strong> Soleva shows low electoral violence, and its background conditions — moderate ethnic polarization, low electoral competitiveness — do not create a strong theoretical expectation of violence in the first place. Because neither the context nor the theory predicts violence here, and none occurred, there is limited analytical leverage in studying it as a single case. You would largely be confirming an expected absence rather than explaining a puzzle. A case where violence was unexpected, or where its absence is surprising given the conditions, would give you considerably more to work with.',
-  brenta:  '<strong>A deviant case with real analytical leverage.</strong> Brenta combines high ethnic polarization, high electoral fraud, and low violence — a pattern that cuts against expectations. Under most theories, including Fjelde\'s, these background conditions should create fertile ground for electoral violence. That it does not occur here makes Brenta a genuinely puzzling case. A single-case study could investigate what is suppressing violence despite the structural conditions that typically enable it — perhaps effective party organization, local elite bargains, or active policing. This is exactly the kind of anomaly that can push theory forward.',
+  brenta:  '<strong>A deviant case with real analytical leverage.</strong> Brenta combines high ethnic polarization, high electoral fraud, and low violence — a pattern that cuts against expectations. Under most theories, these background conditions should create fertile ground for electoral violence. That it does not occur here makes Brenta a genuinely puzzling case. A single-case study could investigate what is suppressing violence despite the structural conditions that typically enable it — perhaps effective party organization, local elite bargains, or active policing. This is exactly the kind of anomaly that can push theory forward.',
   ostara:  '<strong>A potentially informative case for understanding violent processes.</strong> Ostara experienced high electoral violence, making it a useful site for tracing the causal mechanisms that lead to conflict. The language barrier that complicates a comparative design is less decisive in a single-case study — with sufficient preparation and investment in local relationships, it can be managed. Ostara\'s ethnic polarization also remains unknown: fieldwork offers the opportunity to establish that value, which could sharpen the interpretation of why violence occurred in this particular setting.',
   fontega: '<strong>A less analytically productive choice.</strong> Fontega shows low electoral violence, and its background conditions do not generate a strong theoretical expectation of violence. As with Soleva, the absence of violence here is not particularly surprising — which means there is limited analytical traction for a single-case study. You would be confirming an expected absence rather than investigating a puzzle. A case with more unexpected features would give you considerably more to work with.',
 };
@@ -1347,14 +1347,14 @@ function getWrongPairFeedback(d1, d2) {
   const isHigh = v => v === 'high' || v === 'very-high';
 
   if (isHigh(v1) && isHigh(v2)) {
-    return `Both <strong>${DISTRICTS[d1].name}</strong> and <strong>${DISTRICTS[d2].name}</strong> show high levels of electoral violence. A comparative design requires variation in your outcome — without it, there is nothing to explain. You need one high-violence and one low-violence district. Try again.`;
+    return `Both <strong>${DISTRICTS[d1].name}</strong> and <strong>${DISTRICTS[d2].name}</strong> show high levels of electoral violence. A comparative design requires variation in your outcome — without it, there is nothing to explain. Try again.`;
   }
   if (v1 === 'low' && v2 === 'low') {
-    return `Both <strong>${DISTRICTS[d1].name}</strong> and <strong>${DISTRICTS[d2].name}</strong> show low levels of electoral violence. The same principle applies: you need variation in the outcome. Without it, your design has nothing to explain. Select one high-violence and one low-violence district.`;
+    return `Both <strong>${DISTRICTS[d1].name}</strong> and <strong>${DISTRICTS[d2].name}</strong> show low levels of electoral violence. The same principle applies: you need variation in the outcome. Without it, your design has nothing to explain.`;
   }
   const sorted = [d1, d2].sort().join('+');
   if (sorted === 'brenta+ostara') {
-    return `Brenta and Ostara have the right variation in electoral violence — but look more carefully at the control variables. They differ on electoral fraud (High vs. Low), which introduces a potential confound. More critically, Ostara's ethnic polarization is unknown. Ethnic polarization is one of the most consistently cited alternative explanations for electoral violence, and proceeding without knowing Ostara's value means you cannot rule out ethnicity as the true driver of any violence difference you observe. That uncertainty is too consequential to accept.`;
+    return `Brenta and Ostara have the right variation in electoral violence — but look more carefully at the control variables. They differ on electoral fraud (High vs. Low), which introduces a potential confounder. More critically, Ostara's ethnic polarization is unknown. Ethnic polarization is one of the most consistently cited alternative explanations for electoral violence, and proceeding without knowing Ostara's value means you cannot rule out ethnicity as the true driver of any violence difference you observe. That uncertainty is too consequential to accept.`;
   }
 
   if (d1 === 'keldra' || d2 === 'keldra') {
@@ -1388,9 +1388,9 @@ function getWrongPairFeedback(d1, d2) {
   }
 
   if (visibleConfounders.length >= 2) {
-    return `<strong>${hDist.name}</strong> and <strong>${lDist.name}</strong> have the right variation in your outcome, but they differ on <em>${visibleConfounders.join(' and ')}</em> as well. With this many confounders, isolating the effect of party strength becomes very difficult — there are simply too many alternative explanations competing for the same variation. A most-similar systems design works best when the cases are alike on everything except the key independent variable. Look for a cleaner pair.`;
+    return `<strong>${hDist.name}</strong> and <strong>${lDist.name}</strong> have the right variation in your outcome, but they differ on <em>${visibleConfounders.join(' and ')}</em> as well. With this many confounders, isolating the effect of party strength becomes very difficult — there are simply too many alternative explanations competing for the same variation. A most-similar design works best when the cases are alike on everything except the key independent variable. Look for a cleaner pair.`;
   }
-  return `This combination doesn't provide the cleanest basis for comparison. Look carefully at how similar your two districts are on the control variables — and whether the variation in your outcome is large enough and clean enough to support the comparison you have in mind.`;
+  return `This combination doesn't provide the cleanest basis for comparison. Look carefully at how similar your two districts are on the control variables — and whether specific inferential issues may arise when you learn more about the districts.`;
 }
 
 /* ============================================================
@@ -1478,8 +1478,8 @@ function checkS2A() {
   const fb = document.getElementById('s2a-feedback');
   fb.className = 'feedback vis ' + (correct ? 'fb-success' : 'fb-error');
   fb.innerHTML = correct
-    ? `<div class="fb-title">✓ Correct</div><p>That's right. The core strength of a most-similar systems design is its ability to control for background conditions by selecting similar cases — allowing you to attribute differences in the outcome primarily to differences in the independent variable.</p>`
-    : `<div class="fb-title">✗ Not quite</div><p>Think about what the most-similar systems logic is designed to achieve. When cases are similar on most background conditions but differ on the IV and the DV, what does that allow you to argue? Try again.</p>`;
+    ? `<div class="fb-title">✓ Correct</div><p>That's right. The core strength of a most-similar design is its ability to control for background conditions by selecting similar cases — allowing you to attribute differences in the outcome primarily to differences in the independent variable.</p>`
+    : `<div class="fb-title">✗ Not quite</div><p>Think about what the most-similar logic is designed to achieve. When cases are similar on most background conditions but differ on the IV and the DV, what does that allow you to argue? Try again.</p>`;
   if (correct) document.getElementById('s2a-next-row').style.display = 'flex';
 }
 
@@ -1527,7 +1527,7 @@ function checkS2C() {
   const fb = document.getElementById('s2c-feedback');
   fb.className = 'feedback vis ' + (correct ? 'fb-success' : 'fb-error');
   fb.innerHTML = correct
-    ? `<div class="fb-title">✓ Correct — Most-Similar Systems Design (MSSD)</div><p>This is the logic behind your case selection: find cases that are alike on background conditions but differ on the independent variable and the outcome. By holding context constant, you make it more plausible that the IV — party strength — explains the difference in electoral violence.</p>`
+    ? `<div class="fb-title">✓ Correct — Most-Similar Design</div><p>This is the logic behind your case selection: find cases that are alike on background conditions but differ on the independent variable and the outcome. By holding context constant, you make it more plausible that the IV — party strength — explains the difference in electoral violence.</p>`
     : `<div class="fb-title">✗ Not quite</div><p>You've selected cases that are similar on most background conditions, but differ on party strength (IV) and electoral violence (DV). Which design logic does that correspond to? Try again.</p>`;
   if (correct) document.getElementById('s2c-next-row').style.display = 'flex';
 }
@@ -1744,9 +1744,9 @@ function downloadAnswers() {
     return opts.find(o => o.id === state.s2bSelected)?.text || '—';
   })();
   const mcq2c = {
-    a: 'Most-Different Systems Design (MDSD)',
+    a: 'Most-Different Design',
     b: 'Structured Focused Comparison',
-    c: 'Most-Similar Systems Design (MSSD)',
+    c: 'Most-Similar Design',
     d: 'Single-case process tracing',
   }[state.s2cSelected] || '—';
   const members = state.groupMembers.length ? state.groupMembers.join(', ') : '(not recorded)';
